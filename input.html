@@ -1,0 +1,20 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input Data</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <h2>Form Input Customer</h2>
+  <p>*Isi form akan mengikuti flow dari bot Telegram*</p>
+  <div id="app">[form belum diimplementasi]</div>
+  <script src="js/auth.js"></script>
+  <script>
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || user.role !== 'admin') location.href = 'index.html';
+  </script>
+</body>
+</html>
