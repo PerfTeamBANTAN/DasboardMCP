@@ -1,45 +1,77 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Data Pelanggan - CRUD</title>
+  <title>Data Pelanggan - CRUD Login</title>
   <style>
-    table, th, td {
-      border: 1px solid #ccc;
-      border-collapse: collapse;
-      padding: 8px;
-    }
-    th { background: #f0f0f0; }
-    input, textarea {
-      width: 100%;
-    }
-    .editable-row td {
-      background: #ffffe0;
-    }
+    body { font-family: sans-serif; }
+    table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 6px; }
+    th { background: #eee; }
+    input, textarea, select { width: 100%; padding: 4px; margin: 2px 0; }
+    .hidden { display: none; }
+    img, video { max-width: 100px; max-height: 100px; }
   </style>
 </head>
 <body>
-  <h2>Data Pelanggan (Editable)</h2>
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>id</th><th>nama</th><th>email</th><th>hp1</th><th>hp2</th><th>wa di hp</th><th>alamat</th>
-        <th>lokasi</th><th>keterangan alamat</th><th>janji aktivasi</th>
-        <th>sales</th><th>tl sales</th><th>foto1</th><th>video1</th><th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div id="loginSection">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+    <p id="loginStatus"></p>
+  </div>
+
+  <div id="mainSection" class="hidden">
+    <h2>Data Pelanggan</h2>
+    <p>Login sebagai: <span id="loginInfo"></span> | <a href="#" onclick="logout()">Logout</a></p>
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>id</th><th>nama</th><th>email</th><th>hp1</th><th>hp2</th><th>wa di hp</th>
+          <th>alamat</th><th>lokasi</th><th>keterangan alamat</th><th>janji aktivasi</th>
+          <th>sales</th><th>tl sales</th>
+          <th>foto1</th><th>foto2</th><th>foto3</th><th>foto4</th><th>foto5</th>
+          <th>video1</th><th>video2</th><th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec"; // Ganti ini
+    const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec"; // Ganti
+
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      fetch(apiUrl + `?action=login&username=${user}&password=${pass}`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === "ok") {
+            localStorage.setItem("role", res.role);
+            localStorage.setItem("username", user);
+            document.getElementById("loginInfo").innerText = `${user} (${res.role})`;
+            document.getElementById("loginSection").classList.add("hidden");
+            document.getElementById("mainSection").classList.remove("hidden");
+            fetchData();
+          } else {
+            document.getElementById("loginStatus").innerText = "Login gagal";
+          }
+        });
+    }
+
+    function logout() {
+      localStorage.clear();
+      location.reload();
+    }
 
     async function fetchData() {
       const res = await fetch(apiUrl);
       const data = await res.json();
       const tbody = document.querySelector("#dataTable tbody");
-      tbody.innerHTML = "";
+      const role = localStorage.getItem("role");
 
+      tbody.innerHTML = "";
       data.forEach(row => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -55,11 +87,15 @@ DOCTYPE html>
           <td><input value="${row.janji_aktivasi}" data-key="janji_aktivasi"></td>
           <td><input value="${row.sales}" data-key="sales"></td>
           <td><input value="${row.tl_sales}" data-key="tl_sales"></td>
-          <td><input value="${row.foto1}" data-key="foto1"></td>
-          <td><input value="${row.video1}" data-key="video1"></td>
+          <td>${row.foto1 ? `<img src='${row.foto1}'>` : ''}</td>
+          <td>${row.foto2 ? `<img src='${row.foto2}'>` : ''}</td>
+          <td>${row.foto3 ? `<img src='${row.foto3}'>` : ''}</td>
+          <td>${row.foto4 ? `<img src='${row.foto4}'>` : ''}</td>
+          <td>${row.foto5 ? `<img src='${row.foto5}'>` : ''}</td>
+          <td>${row.video1 ? `<video src='${row.video1}' controls>` : ''}</td>
+          <td>${row.video2 ? `<video src='${row.video2}' controls>` : ''}</td>
           <td>
-            <button onclick="saveRow(this)">Simpan</button>
-            <button onclick="deleteRow('${row.id}')">Hapus</button>
+            ${role === 'admin' ? `<button onclick="saveRow(this)">Simpan</button><button onclick="deleteRow('${row.id}')">Hapus</button>` : '-'}
           </td>
         `;
         tbody.appendChild(tr);
@@ -92,8 +128,6 @@ DOCTYPE html>
       alert("Data dihapus");
       fetchData();
     }
-
-    fetchData();
   </script>
 </body>
 </html>
