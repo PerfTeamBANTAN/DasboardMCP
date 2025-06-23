@@ -138,6 +138,7 @@ function renderTable() {
     th.onclick = () => sortTableBy(h);
     tr.appendChild(th);
   });
+  tr.appendChild(document.createElement('th')).textContent = 'AKSI';
   head.appendChild(tr);
 
   data.forEach(row => {
@@ -154,8 +155,25 @@ function renderTable() {
       }
       tr.appendChild(td);
     });
+    const td = document.createElement('td');
+    td.innerHTML = `<button class="bg-blue-500 text-white px-2 py-1 rounded" onclick='fillForm("${row.id}")'>Edit</button>`;
+    tr.appendChild(td);
     body.appendChild(tr);
   });
+}
+
+function fillForm(id) {
+  const entry = data.find(row => row.id == id);
+  if (!entry) return;
+  document.getElementById("form_id").value = entry.id;
+  document.getElementById("form_nama").value = entry.nama;
+  document.getElementById("form_email").value = entry.email;
+  document.getElementById("form_hp1").value = entry.hp1;
+  document.getElementById("form_hp2").value = entry.hp2;
+  document.getElementById("form_wa_di_hp").value = entry.wa_di_hp;
+  document.getElementById("form_alamat").value = entry.alamat;
+  document.getElementById("form_lokasi").value = entry.lokasi;
+  document.getElementById("form_sales").value = entry.sales;
 }
 
 async function saveForm() {
