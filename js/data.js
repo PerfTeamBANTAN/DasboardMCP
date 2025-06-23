@@ -1,4 +1,4 @@
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
+const SHEET_API_URL = "https://api.sheetbest.com/sheets/c8d564d9-1a87-4a2e-afb4-01c2c781c891";
 const user = JSON.parse(localStorage.getItem("user"));
 if (!user) location.href = "index.html";
 
