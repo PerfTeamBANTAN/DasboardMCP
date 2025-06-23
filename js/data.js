@@ -1,5 +1,5 @@
 
-const SHEET_API_URL = "https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_ID/exec"; // Ganti dengan URL Script kamu
+const SHEET_API_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec/exec";
 const user = JSON.parse(localStorage.getItem("user"));
 if (!user) location.href = "index.html";
 
