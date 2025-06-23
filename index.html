@@ -6,195 +6,177 @@
   <title>Web CRUD Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen flex items-center justify-center">
-  <div id="loginBox" class="w-full max-w-sm mx-auto">
-    <div class="bg-white rounded-lg shadow-lg p-8">
-      <h2 class="text-2xl font-bold text-center text-indigo-700 mb-6">Admin Login</h2>
+<body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen">
+  <div id="main" class="w-full max-w-screen-xl mx-auto px-6 py-8">
+    <!-- Login Box -->
+    <div id="loginBox" class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
+      <h2 class="text-3xl font-bold text-center text-indigo-700 mb-6">Admin Login</h2>
       <div class="space-y-4">
         <input id="username" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Username">
         <input id="password" type="password" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Password">
         <button onclick="login()" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">Login</button>
       </div>
     </div>
-  </div>
 
-  <div id="main" class="hidden w-full px-4 py-6">
-    <div class="max-w-screen-xl mx-auto">
-      <div class="bg-white p-6 rounded shadow">
-        <div class="flex justify-between items-center mb-4">
-          <h2 id="welcomeText" class="text-xl font-semibold">Data Pelanggan</h2>
-          <div class="flex gap-2">
-            <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded">Logout</button>
-            <button class="admin-only hidden bg-yellow-500 text-white px-4 py-2 rounded" onclick="showPasswordChanger()">Ganti Password</button>
-          </div>
+    <!-- Main Area -->
+    <div id="app" class="hidden bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 id="welcomeText" class="text-xl font-bold text-gray-800">Data Pelanggan</h2>
+        <div class="flex gap-2">
+          <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded">Logout</button>
+          <button class="admin-only hidden bg-yellow-500 text-white px-4 py-2 rounded" onclick="showPasswordChanger()">Ganti Password</button>
         </div>
+      </div>
 
-        <div id="passwordChanger" class="hidden mb-4">
-          <h3 class="font-semibold mb-2">Ganti Password User</h3>
-          <div class="flex gap-4 mb-2">
-            <input id="targetUser" class="border px-4 py-2 rounded w-1/3" placeholder="Username">
-            <input id="newPassword" type="password" class="border px-4 py-2 rounded w-1/3" placeholder="Password baru">
-            <button onclick="changePassword()" class="bg-green-600 text-white px-4 py-2 rounded">Ganti</button>
-          </div>
+      <!-- Password Change -->
+      <div id="passwordChanger" class="hidden mb-4">
+        <h3 class="font-semibold mb-2">Ganti Password User</h3>
+        <div class="flex flex-wrap gap-4">
+          <input id="targetUser" class="border px-4 py-2 rounded w-1/4" placeholder="Username">
+          <input id="newPassword" type="password" class="border px-4 py-2 rounded w-1/4" placeholder="Password baru">
+          <button onclick="changePassword()" class="bg-green-600 text-white px-4 py-2 rounded">Ganti</button>
         </div>
+      </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full border text-sm">
-            <thead id="tableHead" class="bg-gray-200"></thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
+      <!-- Data Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border">
+          <thead class="bg-indigo-100 text-indigo-900">
+            <tr>
+              <th class="p-2">ID</th><th class="p-2">NAMA</th><th class="p-2">EMAIL</th><th class="p-2">HP1</th><th class="p-2">HP2</th>
+              <th class="p-2">WA DI HP</th><th class="p-2">ALAMAT</th><th class="p-2">LOKASI</th><th class="p-2">KETERANGAN ALAMAT</th><th class="p-2">JANJI AKTIVASI</th>
+              <th class="p-2">SALES</th><th class="p-2">TL SALES</th>
+              <th class="p-2">FOTO1</th><th class="p-2">FOTO2</th><th class="p-2">FOTO3</th><th class="p-2">FOTO4</th><th class="p-2">FOTO5</th>
+              <th class="p-2">VIDEO1</th><th class="p-2">VIDEO2</th>
+              <th class="p-2 admin-only hd-only">Update Teknisi</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
       </div>
     </div>
-  </div>
 
-  <!-- Modal Edit -->
-  <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded shadow max-w-2xl w-full">
-      <div class="flex justify-between mb-4">
-        <h2 class="text-xl font-semibold">Edit Data</h2>
-        <button onclick="closeEditModal()" class="text-red-500 font-bold">X</button>
-      </div>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <input id="edit_id" class="border px-3 py-2 rounded" placeholder="ID" readonly>
-        <input id="edit_nama" class="border px-3 py-2 rounded" placeholder="Nama">
-        <input id="edit_email" class="border px-3 py-2 rounded" placeholder="Email">
-        <input id="edit_hp1" class="border px-3 py-2 rounded" placeholder="HP1">
-        <input id="edit_hp2" class="border px-3 py-2 rounded" placeholder="HP2">
-        <input id="edit_wa_di_hp" class="border px-3 py-2 rounded" placeholder="WA di HP">
-        <input id="edit_alamat" class="border px-3 py-2 rounded col-span-2" placeholder="Alamat">
-        <input id="edit_lokasi" class="border px-3 py-2 rounded" placeholder="Lokasi">
-        <input id="edit_sales" class="border px-3 py-2 rounded" placeholder="Sales">
-      </div>
-      <div class="mt-4 text-right">
-        <button onclick="submitEditForm()" class="bg-blue-600 text-white px-4 py-2 rounded">Simpan Perubahan</button>
+    <!-- Modal Edit -->
+    <div id="modalEdit" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow-md w-full max-w-2xl">
+        <h3 class="text-lg font-semibold mb-4">Edit Data Pelanggan</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <input id="edit_id" class="border px-3 py-2 rounded" placeholder="ID">
+          <input id="edit_nama" class="border px-3 py-2 rounded" placeholder="Nama">
+          <input id="edit_email" class="border px-3 py-2 rounded" placeholder="Email">
+          <input id="edit_hp1" class="border px-3 py-2 rounded" placeholder="HP1">
+          <input id="edit_hp2" class="border px-3 py-2 rounded" placeholder="HP2">
+          <input id="edit_wa_di_hp" class="border px-3 py-2 rounded" placeholder="WA di HP">
+          <input id="edit_alamat" class="border px-3 py-2 rounded col-span-2" placeholder="Alamat">
+          <input id="edit_lokasi" class="border px-3 py-2 rounded" placeholder="Lokasi">
+          <input id="edit_keterangan_alamat" class="border px-3 py-2 rounded col-span-2" placeholder="Keterangan Alamat">
+          <input id="edit_janji_aktivasi" class="border px-3 py-2 rounded" placeholder="Janji Aktivasi">
+          <input id="edit_sales" class="border px-3 py-2 rounded" placeholder="Sales">
+          <input id="edit_tl_sales" class="border px-3 py-2 rounded" placeholder="TL Sales">
+        </div>
+        <div class="flex justify-end mt-4">
+          <button onclick="closeEditModal()" class="px-4 py-2 bg-gray-400 text-white rounded mr-2">Batal</button>
+          <button onclick="submitEdit()" class="px-4 py-2 bg-blue-600 text-white rounded">Simpan</button>
+        </div>
       </div>
     </div>
   </div>
 
 <script>
 const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
-let data = [], userRole = '', userName = '', currentSort = { column: '', asc: true }, selectedEditData = {};
+let data = [], userRole = '', userName = '';
 
-async function login() {
+function login() {
   const uname = document.getElementById('username').value;
   const pass = document.getElementById('password').value;
-  const res = await fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`);
-  const json = await res.json();
-
-  if (json.status === 'ok') {
-    userRole = json.role;
-    userName = uname;
-    document.getElementById('main').classList.remove('hidden');
-    document.getElementById('loginBox').classList.add('hidden');
-    document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
-    if (userRole === 'admin') document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-    loadData();
-  } else {
-    alert('Login gagal');
-  }
+  fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`)
+    .then(res => res.json())
+    .then(json => {
+      if (json.status === 'ok') {
+        userRole = json.role;
+        userName = uname;
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
+        if (userRole === 'admin' || userRole === 'hd') document.querySelectorAll('.admin-only, .hd-only').forEach(e => e.classList.remove('hidden'));
+        loadData();
+      } else {
+        alert('Login gagal');
+      }
+    });
 }
 
 function logout() { location.reload(); }
 function showPasswordChanger() { document.getElementById('passwordChanger').classList.remove('hidden'); }
-function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
+function closeEditModal() { document.getElementById('modalEdit').classList.add('hidden'); }
 
-async function changePassword() {
-  const uname = document.getElementById('targetUser').value.trim();
-  const pass = document.getElementById('newPassword').value.trim();
-  if (!uname || !pass) return alert('Lengkapi isian');
-  const res = await fetch(apiUrl, { method: 'POST', body: JSON.stringify({ method: 'CHANGE_PASSWORD', username: uname, password: pass }) });
-  alert(await res.text());
-}
-
-async function loadData() {
-  const res = await fetch(apiUrl);
-  data = await res.json();
-  renderTable();
-}
-
-function sortTableBy(column) {
-  const col = column.toLowerCase().replace(/ /g, '_');
-  const asc = (currentSort.column !== col) ? true : !currentSort.asc;
-  currentSort = { column: col, asc };
-  data.sort((a, b) => a[col] > b[col] ? (asc ? 1 : -1) : (a[col] < b[col] ? (asc ? -1 : 1) : 0));
-  renderTable();
+function loadData() {
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(json => {
+      data = json;
+      renderTable();
+    });
 }
 
 function renderTable() {
-  const head = document.getElementById('tableHead');
-  const body = document.getElementById('tableBody');
-  head.innerHTML = '';
-  body.innerHTML = '';
-
-  if (!data.length) return;
-  const headers = Object.keys(data[0]);
-  const tr = document.createElement('tr');
-  headers.forEach(h => {
-    const th = document.createElement('th');
-    th.className = 'p-2';
-    th.textContent = h.replace(/_/g, ' ').toUpperCase();
-    th.onclick = () => sortTableBy(h);
-    tr.appendChild(th);
-  });
-  tr.innerHTML += '<th class="p-2">AKSI</th>';
-  head.appendChild(tr);
-
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  const visibleKeys = ["id","nama","email","hp1","hp2","wa_di_hp","alamat","lokasi","keterangan_alamat","janji_aktivasi","sales","tl_sales","foto1","foto2","foto3","foto4","foto5","video1","video2"];
   data.forEach(row => {
     const tr = document.createElement('tr');
-    headers.forEach(h => {
+    visibleKeys.forEach(k => {
       const td = document.createElement('td');
       td.className = 'p-2';
-      if (h.startsWith('foto') && row[h]) {
-        td.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${row[h]}" class="w-24"/>`;
-      } else if (h.startsWith('video') && row[h]) {
-        td.innerHTML = `<video class="w-40" controls><source src="https://drive.google.com/uc?export=view&id=${row[h]}" type="video/mp4"></video>`;
+      if (k.startsWith('foto') && row[k]) {
+        td.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${row[k]}" class="w-20 h-auto">`;
+      } else if (k.startsWith('video') && row[k]) {
+        td.innerHTML = `<video class="w-32" controls><source src="https://drive.google.com/uc?export=view&id=${row[k]}" type="video/mp4"></video>`;
       } else {
-        td.textContent = row[h];
+        td.textContent = row[k] || '';
       }
       tr.appendChild(td);
     });
-    const actionTd = document.createElement('td');
-    actionTd.innerHTML = `<button onclick='openEditModal(${JSON.stringify(row)})' class='text-blue-600 underline'>Edit</button>`;
-    tr.appendChild(actionTd);
-    body.appendChild(tr);
+    if (userRole === 'admin' || userRole === 'hd') {
+      const tdEdit = document.createElement('td');
+      tdEdit.innerHTML = `<button onclick='openEdit(${JSON.stringify(row)})' class='text-blue-600 hover:underline'>Edit</button>`;
+      tr.appendChild(tdEdit);
+    }
+    tbody.appendChild(tr);
   });
 }
 
-function openEditModal(row) {
-  selectedEditData = row;
-  document.getElementById("edit_id").value = row.id || '';
-  document.getElementById("edit_nama").value = row.nama || '';
-  document.getElementById("edit_email").value = row.email || '';
-  document.getElementById("edit_hp1").value = row.hp1 || '';
-  document.getElementById("edit_hp2").value = row.hp2 || '';
-  document.getElementById("edit_wa_di_hp").value = row.wa_di_hp || '';
-  document.getElementById("edit_alamat").value = row.alamat || '';
-  document.getElementById("edit_lokasi").value = row.lokasi || '';
-  document.getElementById("edit_sales").value = row.sales || '';
-  document.getElementById("editModal").classList.remove('hidden');
+function openEdit(row) {
+  document.getElementById('modalEdit').classList.remove('hidden');
+  for (const key in row) {
+    const input = document.getElementById(`edit_${key}`);
+    if (input) input.value = row[key];
+  }
 }
 
-async function submitEditForm() {
-  const formData = {
-    method: "PUT",
-    id: document.getElementById("edit_id").value,
-    nama: document.getElementById("edit_nama").value,
-    email: document.getElementById("edit_email").value,
-    hp1: document.getElementById("edit_hp1").value,
-    hp2: document.getElementById("edit_hp2").value,
-    wa_di_hp: document.getElementById("edit_wa_di_hp").value,
-    alamat: document.getElementById("edit_alamat").value,
-    lokasi: document.getElementById("edit_lokasi").value,
-    sales: document.getElementById("edit_sales").value,
-  };
-  const res = await fetch(apiUrl, {
-    method: "POST",
-    body: JSON.stringify(formData)
+function submitEdit() {
+  const fields = ["id","nama","email","hp1","hp2","wa_di_hp","alamat","lokasi","keterangan_alamat","janji_aktivasi","sales","tl_sales"];
+  const payload = { method: 'PUT' };
+  fields.forEach(f => payload[f] = document.getElementById(`edit_${f}`).value);
+
+  fetch(apiUrl, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }).then(res => res.text()).then(msg => {
+    alert(msg);
+    closeEditModal();
+    loadData();
   });
-  alert(await res.text());
-  closeEditModal();
-  loadData();
+}
+
+function changePassword() {
+  const uname = document.getElementById('targetUser').value.trim();
+  const pass = document.getElementById('newPassword').value.trim();
+  if (!uname || !pass) return alert('Lengkapi isian');
+  fetch(apiUrl, {
+    method: 'POST',
+    body: JSON.stringify({ method: 'CHANGE_PASSWORD', username: uname, password: pass })
+  }).then(res => res.text()).then(alert);
 }
 </script>
 </body>
