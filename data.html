@@ -1,33 +1,16 @@
-html lang="id">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data Pelanggan</title>
   <link rel="stylesheet" href="assets/style.css" />
-  <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    tr:nth-child(even) { background-color: #f9f9f9; }
-    tr:hover { background-color: #f1f1f1; }
-    .edit-btn { background: #ffa500; color: #fff; border: none; padding: 4px 8px; cursor: pointer; }
-    .save-btn { background: #28a745; color: #fff; border: none; padding: 4px 8px; cursor: pointer; }
-  </style>
 </head>
 <body>
-  <h2>📋 Data Pelanggan (Sinkron Bot Telegram)</h2>
+  <h2>📋 Data Pelanggan</h2>
   <p id="info"></p>
-  <div style="overflow-x:auto">
-    <table id="data-table"></table>
-  </div>
+  <table id="data-table"></table>
   <button onclick="logout()">Logout</button>
-
   <script src="js/auth.js"></script>
   <script src="js/data.js"></script>
 </body>
