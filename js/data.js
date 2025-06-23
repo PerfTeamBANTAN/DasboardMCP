@@ -1,4 +1,4 @@
-const SHEET_API_URL = "https://api.sheetbest.com/sheets/c8d564d9-1a87-4a2e-afb4-01c2c781c891";
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
 const user = JSON.parse(localStorage.getItem("user"));
 if (!user) location.href = "index.html";
 
@@ -84,17 +84,19 @@ function buildTable(data) {
 
 
 function saveRow(row, headers) {
+  const idUnik = row.dataset.id;
   const cells = row.querySelectorAll("td");
-  const dataObj = {};
 
-  headers.forEach((key, i) => {
-    dataObj[key] = cells[i].textContent;
+  const rowData = {};
+  headers.forEach((key, index) => {
+    const td = cells[index];
+    rowData[key] = td.textContent;
   });
 
   fetch(SHEET_API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dataObj)
+    body: JSON.stringify({ idUnik: idUnik, row: rowData })
   })
     .then(res => res.text())
     .then(txt => alert("✅ Data berhasil disimpan!"))
