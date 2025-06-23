@@ -55,3 +55,9 @@ th {
   color: red;
   margin-top: 10px;
 }
+img, video {
+  max-height: 100px;
+  object-fit: cover;
+  display: block;
+  margin: 4px 0;
+}
