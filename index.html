@@ -7,8 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen flex items-center justify-center">
-  <div class="w-full max-w-md">
-    <div id="loginBox" class="bg-white rounded-lg shadow-lg p-8">
+  <div id="loginBox" class="w-full max-w-sm mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-8">
       <h2 class="text-2xl font-bold text-center text-indigo-700 mb-6">Admin Login</h2>
       <div class="space-y-4">
         <input id="username" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Username">
@@ -18,7 +18,7 @@
     </div>
   </div>
 
-  <div id="main" class="hidden w-full px-10 py-6">
+  <div id="main" class="hidden w-full px-4 py-6">
     <div class="max-w-screen-xl mx-auto">
       <div class="bg-white p-6 rounded shadow">
         <div class="flex justify-between items-center mb-4">
@@ -38,22 +38,6 @@
           </div>
         </div>
 
-        <div class="mb-4">
-          <h3 class="font-semibold mb-2">Form Tambah/Edit Data</h3>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-            <input id="form_id" class="border px-3 py-2 rounded" placeholder="ID">
-            <input id="form_nama" class="border px-3 py-2 rounded" placeholder="Nama">
-            <input id="form_email" class="border px-3 py-2 rounded" placeholder="Email">
-            <input id="form_hp1" class="border px-3 py-2 rounded" placeholder="HP1">
-            <input id="form_hp2" class="border px-3 py-2 rounded" placeholder="HP2">
-            <input id="form_wa_di_hp" class="border px-3 py-2 rounded" placeholder="WA di HP">
-            <input id="form_alamat" class="border px-3 py-2 rounded col-span-2" placeholder="Alamat">
-            <input id="form_lokasi" class="border px-3 py-2 rounded" placeholder="Lokasi">
-            <input id="form_sales" class="border px-3 py-2 rounded" placeholder="Sales">
-          </div>
-          <button onclick="saveForm()" class="bg-blue-600 text-white px-4 py-2 rounded">Simpan</button>
-        </div>
-
         <div class="overflow-x-auto">
           <table class="w-full border text-sm">
             <thead id="tableHead" class="bg-gray-200"></thead>
@@ -64,10 +48,33 @@
     </div>
   </div>
 
+  <!-- Modal Edit -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded shadow max-w-2xl w-full">
+      <div class="flex justify-between mb-4">
+        <h2 class="text-xl font-semibold">Edit Data</h2>
+        <button onclick="closeEditModal()" class="text-red-500 font-bold">X</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <input id="edit_id" class="border px-3 py-2 rounded" placeholder="ID" readonly>
+        <input id="edit_nama" class="border px-3 py-2 rounded" placeholder="Nama">
+        <input id="edit_email" class="border px-3 py-2 rounded" placeholder="Email">
+        <input id="edit_hp1" class="border px-3 py-2 rounded" placeholder="HP1">
+        <input id="edit_hp2" class="border px-3 py-2 rounded" placeholder="HP2">
+        <input id="edit_wa_di_hp" class="border px-3 py-2 rounded" placeholder="WA di HP">
+        <input id="edit_alamat" class="border px-3 py-2 rounded col-span-2" placeholder="Alamat">
+        <input id="edit_lokasi" class="border px-3 py-2 rounded" placeholder="Lokasi">
+        <input id="edit_sales" class="border px-3 py-2 rounded" placeholder="Sales">
+      </div>
+      <div class="mt-4 text-right">
+        <button onclick="submitEditForm()" class="bg-blue-600 text-white px-4 py-2 rounded">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
-let data = [], userRole = '', userName = '';
-let currentSort = { column: '', asc: true };
+let data = [], userRole = '', userName = '', currentSort = { column: '', asc: true }, selectedEditData = {};
 
 async function login() {
   const uname = document.getElementById('username').value;
@@ -88,23 +95,15 @@ async function login() {
   }
 }
 
-function logout() {
-  location.reload();
-}
-
-function showPasswordChanger() {
-  document.getElementById('passwordChanger').classList.remove('hidden');
-}
+function logout() { location.reload(); }
+function showPasswordChanger() { document.getElementById('passwordChanger').classList.remove('hidden'); }
+function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
 
 async function changePassword() {
   const uname = document.getElementById('targetUser').value.trim();
   const pass = document.getElementById('newPassword').value.trim();
   if (!uname || !pass) return alert('Lengkapi isian');
-
-  const res = await fetch(apiUrl, {
-    method: 'POST',
-    body: JSON.stringify({ method: 'CHANGE_PASSWORD', username: uname, password: pass })
-  });
+  const res = await fetch(apiUrl, { method: 'POST', body: JSON.stringify({ method: 'CHANGE_PASSWORD', username: uname, password: pass }) });
   alert(await res.text());
 }
 
@@ -133,15 +132,12 @@ function renderTable() {
   const tr = document.createElement('tr');
   headers.forEach(h => {
     const th = document.createElement('th');
-    th.className = 'p-2 cursor-pointer hover:bg-gray-300';
+    th.className = 'p-2';
     th.textContent = h.replace(/_/g, ' ').toUpperCase();
     th.onclick = () => sortTableBy(h);
     tr.appendChild(th);
   });
-  const thAction = document.createElement('th');
-  thAction.className = 'p-2';
-  thAction.textContent = "AKSI";
-  tr.appendChild(thAction);
+  tr.innerHTML += '<th class="p-2">AKSI</th>';
   head.appendChild(tr);
 
   data.forEach(row => {
@@ -158,52 +154,46 @@ function renderTable() {
       }
       tr.appendChild(td);
     });
-    const tdAction = document.createElement('td');
-    tdAction.className = 'p-2';
-    tdAction.innerHTML = `<button class="bg-blue-500 text-white px-2 py-1 rounded" onclick='fillForm("${JSON.stringify(row).replace(/"/g, "&quot;")}")'>Edit</button>`;
-    tr.appendChild(tdAction);
+    const actionTd = document.createElement('td');
+    actionTd.innerHTML = `<button onclick='openEditModal(${JSON.stringify(row)})' class='text-blue-600 underline'>Edit</button>`;
+    tr.appendChild(actionTd);
     body.appendChild(tr);
   });
 }
 
-function fillForm(rowStr) {
-  const row = JSON.parse(rowStr);
-  document.getElementById("form_id").value = row.id || "";
-  document.getElementById("form_nama").value = row.nama || "";
-  document.getElementById("form_email").value = row.email || "";
-  document.getElementById("form_hp1").value = row.hp1 || "";
-  document.getElementById("form_hp2").value = row.hp2 || "";
-  document.getElementById("form_wa_di_hp").value = row.wa_di_hp || "";
-  document.getElementById("form_alamat").value = row.alamat || "";
-  document.getElementById("form_lokasi").value = row.lokasi || "";
-  document.getElementById("form_sales").value = row.sales || "";
+function openEditModal(row) {
+  selectedEditData = row;
+  document.getElementById("edit_id").value = row.id || '';
+  document.getElementById("edit_nama").value = row.nama || '';
+  document.getElementById("edit_email").value = row.email || '';
+  document.getElementById("edit_hp1").value = row.hp1 || '';
+  document.getElementById("edit_hp2").value = row.hp2 || '';
+  document.getElementById("edit_wa_di_hp").value = row.wa_di_hp || '';
+  document.getElementById("edit_alamat").value = row.alamat || '';
+  document.getElementById("edit_lokasi").value = row.lokasi || '';
+  document.getElementById("edit_sales").value = row.sales || '';
+  document.getElementById("editModal").classList.remove('hidden');
 }
 
-async function saveForm() {
+async function submitEditForm() {
   const formData = {
     method: "PUT",
-    id: document.getElementById("form_id").value,
-    nama: document.getElementById("form_nama").value,
-    email: document.getElementById("form_email").value,
-    hp1: document.getElementById("form_hp1").value,
-    hp2: document.getElementById("form_hp2").value,
-    wa_di_hp: document.getElementById("form_wa_di_hp").value,
-    alamat: document.getElementById("form_alamat").value,
-    lokasi: document.getElementById("form_lokasi").value,
-    sales: document.getElementById("form_sales").value,
+    id: document.getElementById("edit_id").value,
+    nama: document.getElementById("edit_nama").value,
+    email: document.getElementById("edit_email").value,
+    hp1: document.getElementById("edit_hp1").value,
+    hp2: document.getElementById("edit_hp2").value,
+    wa_di_hp: document.getElementById("edit_wa_di_hp").value,
+    alamat: document.getElementById("edit_alamat").value,
+    lokasi: document.getElementById("edit_lokasi").value,
+    sales: document.getElementById("edit_sales").value,
   };
-
-  if (!formData.id || !formData.nama || !formData.email || !formData.hp1) {
-    alert("Kolom ID, Nama, Email, dan HP1 wajib diisi.");
-    return;
-  }
-
   const res = await fetch(apiUrl, {
     method: "POST",
     body: JSON.stringify(formData)
   });
-  const text = await res.text();
-  alert(text);
+  alert(await res.text());
+  closeEditModal();
   loadData();
 }
 </script>
