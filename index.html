@@ -1,133 +1,129 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Data Pelanggan - CRUD Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web CRUD Admin</title>
   <style>
-    body { font-family: sans-serif; }
     table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 6px; }
-    th { background: #eee; }
-    input, textarea, select { width: 100%; padding: 4px; margin: 2px 0; }
-    .hidden { display: none; }
-    img, video { max-width: 100px; max-height: 100px; }
+    th { cursor: pointer; background: #f0f0f0; }
+    .admin-only { display: none; }
   </style>
 </head>
 <body>
-  <div id="loginSection">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username"><br>
-    <input type="password" id="password" placeholder="Password"><br>
-    <button onclick="login()">Login</button>
-    <p id="loginStatus"></p>
-  </div>
+  <h2>Login</h2>
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <hr/>
 
-  <div id="mainSection" class="hidden">
+  <div id="main" style="display:none;">
     <h2>Data Pelanggan</h2>
-    <p>Login sebagai: <span id="loginInfo"></span> | <a href="#" onclick="logout()">Logout</a></p>
+    <button onclick="logout()">Logout</button>
+    <button class="admin-only" onclick="showPasswordChanger()">Ganti Password</button>
+    <div id="passwordChanger" style="display:none">
+      <h3>Ganti Password User</h3>
+      <input id="targetUser" placeholder="Username">
+      <input id="newPassword" type="password" placeholder="Password baru">
+      <button onclick="changePassword()">Ganti</button>
+    </div>
+
     <table id="dataTable">
-      <thead>
-        <tr>
-          <th>id</th><th>nama</th><th>email</th><th>hp1</th><th>hp2</th><th>wa di hp</th>
-          <th>alamat</th><th>lokasi</th><th>keterangan alamat</th><th>janji aktivasi</th>
-          <th>sales</th><th>tl sales</th>
-          <th>foto1</th><th>foto2</th><th>foto3</th><th>foto4</th><th>foto5</th>
-          <th>video1</th><th>video2</th><th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
     </table>
   </div>
 
-  <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec"; // Ganti
+<script>
+const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
+let data = [], userRole = '', userName = '';
+let currentSort = { column: '', asc: true };
 
-    function login() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
-      fetch(apiUrl + `?action=login&username=${user}&password=${pass}`)
-        .then(res => res.json())
-        .then(res => {
-          if (res.status === "ok") {
-            localStorage.setItem("role", res.role);
-            localStorage.setItem("username", user);
-            document.getElementById("loginInfo").innerText = `${user} (${res.role})`;
-            document.getElementById("loginSection").classList.add("hidden");
-            document.getElementById("mainSection").classList.remove("hidden");
-            fetchData();
-          } else {
-            document.getElementById("loginStatus").innerText = "Login gagal";
-          }
-        });
-    }
+async function login() {
+  const uname = document.getElementById('username').value;
+  const pass = document.getElementById('password').value;
+  const res = await fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`);
+  const json = await res.json();
 
-    function logout() {
-      localStorage.clear();
-      location.reload();
-    }
+  if (json.status === 'ok') {
+    userRole = json.role;
+    userName = uname;
+    document.getElementById('main').style.display = 'block';
+    document.querySelector('h2').textContent = `Selamat datang, ${uname} (${userRole})`;
+    if (userRole === 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-block');
+    loadData();
+  } else {
+    alert('Login gagal');
+  }
+}
 
-    async function fetchData() {
-      const res = await fetch(apiUrl);
-      const data = await res.json();
-      const tbody = document.querySelector("#dataTable tbody");
-      const role = localStorage.getItem("role");
+function logout() {
+  location.reload();
+}
 
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><input value="${row.id}" data-key="id" disabled></td>
-          <td><input value="${row.nama}" data-key="nama"></td>
-          <td><input value="${row.email}" data-key="email"></td>
-          <td><input value="${row.hp1}" data-key="hp1"></td>
-          <td><input value="${row.hp2}" data-key="hp2"></td>
-          <td><input value="${row.wa_di_hp}" data-key="wa_di_hp"></td>
-          <td><textarea data-key="alamat">${row.alamat}</textarea></td>
-          <td><input value="${row.lokasi}" data-key="lokasi"></td>
-          <td><textarea data-key="keterangan_alamat">${row.keterangan_alamat}</textarea></td>
-          <td><input value="${row.janji_aktivasi}" data-key="janji_aktivasi"></td>
-          <td><input value="${row.sales}" data-key="sales"></td>
-          <td><input value="${row.tl_sales}" data-key="tl_sales"></td>
-          <td>${row.foto1 ? `<img src='${row.foto1}'>` : ''}</td>
-          <td>${row.foto2 ? `<img src='${row.foto2}'>` : ''}</td>
-          <td>${row.foto3 ? `<img src='${row.foto3}'>` : ''}</td>
-          <td>${row.foto4 ? `<img src='${row.foto4}'>` : ''}</td>
-          <td>${row.foto5 ? `<img src='${row.foto5}'>` : ''}</td>
-          <td>${row.video1 ? `<video src='${row.video1}' controls>` : ''}</td>
-          <td>${row.video2 ? `<video src='${row.video2}' controls>` : ''}</td>
-          <td>
-            ${role === 'admin' ? `<button onclick="saveRow(this)">Simpan</button><button onclick="deleteRow('${row.id}')">Hapus</button>` : '-'}
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+function showPasswordChanger() {
+  document.getElementById('passwordChanger').style.display = 'block';
+}
 
-    async function saveRow(button) {
-      const row = button.closest("tr");
-      const inputs = row.querySelectorAll("input, textarea");
-      const data = {};
-      inputs.forEach(input => {
-        const key = input.dataset.key;
-        if (key) data[key] = input.value;
-      });
-      data.method = "PUT";
+async function changePassword() {
+  const uname = document.getElementById('targetUser').value.trim();
+  const pass = document.getElementById('newPassword').value.trim();
+  if (!uname || !pass) return alert('Lengkapi isian');
 
-      await fetch(apiUrl, {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
-      alert("Data diperbarui");
-    }
+  const res = await fetch(apiUrl, {
+    method: 'POST',
+    body: JSON.stringify({ method: 'CHANGE_PASSWORD', username: uname, password: pass })
+  });
+  alert(await res.text());
+}
 
-    async function deleteRow(id) {
-      if (!confirm("Hapus data dengan ID " + id + " ?")) return;
-      await fetch(apiUrl, {
-        method: "POST",
-        body: JSON.stringify({ method: "DELETE", id })
-      });
-      alert("Data dihapus");
-      fetchData();
-    }
-  </script>
+async function loadData() {
+  const res = await fetch(apiUrl);
+  data = await res.json();
+  renderTable();
+}
+
+function sortTableBy(column) {
+  const col = column.toLowerCase().replace(/ /g, '_');
+  const asc = (currentSort.column !== col) ? true : !currentSort.asc;
+  currentSort = { column: col, asc };
+  data.sort((a, b) => a[col] > b[col] ? (asc ? 1 : -1) : (a[col] < b[col] ? (asc ? -1 : 1) : 0));
+  renderTable();
+}
+
+function renderTable() {
+  const head = document.getElementById('tableHead');
+  const body = document.getElementById('tableBody');
+  head.innerHTML = '';
+  body.innerHTML = '';
+
+  if (!data.length) return;
+  const headers = Object.keys(data[0]);
+  const tr = document.createElement('tr');
+  headers.forEach(h => {
+    const th = document.createElement('th');
+    th.textContent = h.replace(/_/g, ' ').toUpperCase();
+    th.onclick = () => sortTableBy(h);
+    tr.appendChild(th);
+  });
+  head.appendChild(tr);
+
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    headers.forEach(h => {
+      const td = document.createElement('td');
+      if (h.startsWith('foto') && row[h]) {
+        td.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${row[h]}" width="100"/>`;
+      } else if (h.startsWith('video') && row[h]) {
+        td.innerHTML = `<video width="160" controls><source src="https://drive.google.com/uc?export=view&id=${row[h]}" type="video/mp4"></video>`;
+      } else {
+        td.textContent = row[h];
+      }
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+}
+</script>
 </body>
 </html>
