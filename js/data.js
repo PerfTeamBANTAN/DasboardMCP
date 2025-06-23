@@ -2,7 +2,7 @@ const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUz
 const user = JSON.parse(localStorage.getItem("user"));
 if (!user) location.href = "index.html";
 
-document.getElementById("info").textContent = Login sebagai: ${user.username} (${user.role});
+document.getElementById("info").textContent = `Login sebagai: ${user.username} (${user.role})`;
 
 fetch(SHEET_API_URL)
   .then(res => res.json())
@@ -13,7 +13,7 @@ function buildTable(data) {
   const table = document.getElementById("data-table");
   table.innerHTML = "";
 
-  const headers = Object.keys(data[0]); // Ambil nama kolom dari object
+  const headers = Object.keys(data[0]);
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
 
@@ -33,9 +33,10 @@ function buildTable(data) {
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
+
   data.forEach(rowObj => {
     const row = document.createElement("tr");
-    row.dataset.id = rowObj["id_unik"]; // ID unik disimpan di atribut row
+    row.dataset.id = rowObj["id_unik"] || rowObj["id"] || rowObj["ID"]; // fallback id key
 
     headers.forEach((key, j) => {
       const td = document.createElement("td");
@@ -45,14 +46,14 @@ function buildTable(data) {
       if (isMediaColumn && cell && cell.length > 10) {
         if (j <= 18) {
           const img = document.createElement("img");
-          img.src = https://drive.google.com/uc?export=view&id=${cell};
+          img.src = `https://drive.google.com/uc?export=view&id=${cell}`;
           img.style.maxWidth = "100px";
           img.style.borderRadius = "8px";
           img.style.margin = "4px 0";
           td.appendChild(img);
         } else {
           const video = document.createElement("video");
-          video.src = https://drive.google.com/uc?export=view&id=${cell};
+          video.src = `https://drive.google.com/uc?export=view&id=${cell}`;
           video.controls = true;
           video.style.maxWidth = "160px";
           video.style.margin = "4px 0";
@@ -81,8 +82,6 @@ function buildTable(data) {
 
   table.appendChild(tbody);
 }
-
-
 
 function saveRow(row, headers) {
   const idUnik = row.dataset.id;
