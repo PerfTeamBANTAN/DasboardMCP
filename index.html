@@ -18,8 +18,8 @@
     </div>
   </div>
 
-  <div id="main" class="hidden w-full px-4 py-6">
-    <div class="max-w-6xl mx-auto">
+  <div id="main" class="hidden w-full px-10 py-6">
+    <div class="max-w-screen-xl mx-auto">
       <div class="bg-white p-6 rounded shadow">
         <div class="flex justify-between items-center mb-4">
           <h2 id="welcomeText" class="text-xl font-semibold">Data Pelanggan</h2>
@@ -133,12 +133,15 @@ function renderTable() {
   const tr = document.createElement('tr');
   headers.forEach(h => {
     const th = document.createElement('th');
-    th.className = 'p-2';
+    th.className = 'p-2 cursor-pointer hover:bg-gray-300';
     th.textContent = h.replace(/_/g, ' ').toUpperCase();
     th.onclick = () => sortTableBy(h);
     tr.appendChild(th);
   });
-  tr.appendChild(document.createElement('th')).textContent = 'AKSI';
+  const thAction = document.createElement('th');
+  thAction.className = 'p-2';
+  thAction.textContent = "AKSI";
+  tr.appendChild(thAction);
   head.appendChild(tr);
 
   data.forEach(row => {
@@ -155,25 +158,25 @@ function renderTable() {
       }
       tr.appendChild(td);
     });
-    const td = document.createElement('td');
-    td.innerHTML = `<button class="bg-blue-500 text-white px-2 py-1 rounded" onclick='fillForm("${row.id}")'>Edit</button>`;
-    tr.appendChild(td);
+    const tdAction = document.createElement('td');
+    tdAction.className = 'p-2';
+    tdAction.innerHTML = `<button class="bg-blue-500 text-white px-2 py-1 rounded" onclick='fillForm("${JSON.stringify(row).replace(/"/g, "&quot;")}")'>Edit</button>`;
+    tr.appendChild(tdAction);
     body.appendChild(tr);
   });
 }
 
-function fillForm(id) {
-  const entry = data.find(row => row.id == id);
-  if (!entry) return;
-  document.getElementById("form_id").value = entry.id;
-  document.getElementById("form_nama").value = entry.nama;
-  document.getElementById("form_email").value = entry.email;
-  document.getElementById("form_hp1").value = entry.hp1;
-  document.getElementById("form_hp2").value = entry.hp2;
-  document.getElementById("form_wa_di_hp").value = entry.wa_di_hp;
-  document.getElementById("form_alamat").value = entry.alamat;
-  document.getElementById("form_lokasi").value = entry.lokasi;
-  document.getElementById("form_sales").value = entry.sales;
+function fillForm(rowStr) {
+  const row = JSON.parse(rowStr);
+  document.getElementById("form_id").value = row.id || "";
+  document.getElementById("form_nama").value = row.nama || "";
+  document.getElementById("form_email").value = row.email || "";
+  document.getElementById("form_hp1").value = row.hp1 || "";
+  document.getElementById("form_hp2").value = row.hp2 || "";
+  document.getElementById("form_wa_di_hp").value = row.wa_di_hp || "";
+  document.getElementById("form_alamat").value = row.alamat || "";
+  document.getElementById("form_lokasi").value = row.lokasi || "";
+  document.getElementById("form_sales").value = row.sales || "";
 }
 
 async function saveForm() {
