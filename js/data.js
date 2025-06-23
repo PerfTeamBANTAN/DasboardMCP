@@ -2,7 +2,7 @@ const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUz
 const user = JSON.parse(localStorage.getItem("user"));
 if (!user) location.href = "index.html";
 
-document.getElementById("info").textContent = `Login sebagai: ${user.username} (${user.role})`;
+document.getElementById("info").textContent = Login sebagai: ${user.username} (${user.role});
 
 fetch(SHEET_API_URL)
   .then(res => res.json())
@@ -38,36 +38,33 @@ function buildTable(data) {
     row.dataset.id = rowObj["id_unik"]; // ID unik disimpan di atribut row
 
     headers.forEach((key, j) => {
-  const td = document.createElement("td");
-  const cell = rowObj[key];
-  const isMediaColumn = j >= 14 && j <= 20;
+      const td = document.createElement("td");
+      const cell = rowObj[key];
+      const isMediaColumn = j >= 14 && j <= 20;
 
-  if (isMediaColumn && cell && cell.length > 10) {
-    if (j <= 18) {
-      // Tampilkan gambar
-      const img = document.createElement("img");
-      img.src = `https://drive.google.com/uc?export=view&id=${cell}`;
-      img.style.maxWidth = "100px";
-      img.style.borderRadius = "8px";
-      img.style.margin = "4px 0";
-      td.appendChild(img);
-    } else {
-      // Tampilkan video dengan iframe
-      const iframe = document.createElement("iframe");
-      iframe.src = `https://drive.google.com/file/d/${cell}/preview`;
-      iframe.width = "200";
-      iframe.height = "120";
-      iframe.allowFullscreen = true;
-      iframe.style.border = "none";
-      td.appendChild(iframe);
-    }
-  } else {
-    td.textContent = cell;
-    td.contentEditable = user.role === 'admin' && !isMediaColumn;
-  }
+      if (isMediaColumn && cell && cell.length > 10) {
+        if (j <= 18) {
+          const img = document.createElement("img");
+          img.src = https://drive.google.com/uc?export=view&id=${cell};
+          img.style.maxWidth = "100px";
+          img.style.borderRadius = "8px";
+          img.style.margin = "4px 0";
+          td.appendChild(img);
+        } else {
+          const video = document.createElement("video");
+          video.src = https://drive.google.com/uc?export=view&id=${cell};
+          video.controls = true;
+          video.style.maxWidth = "160px";
+          video.style.margin = "4px 0";
+          td.appendChild(video);
+        }
+      } else {
+        td.textContent = cell;
+        td.contentEditable = user.role === 'admin' && !isMediaColumn;
+      }
 
-  row.appendChild(td);
-});
+      row.appendChild(td);
+    });
 
     if (user.role === 'admin') {
       const tdAction = document.createElement("td");
@@ -84,6 +81,7 @@ function buildTable(data) {
 
   table.appendChild(tbody);
 }
+
 
 
 function saveRow(row, headers) {
