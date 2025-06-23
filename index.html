@@ -4,38 +4,66 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web CRUD Admin</title>
-  <style>
-    table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 6px; }
-    th { cursor: pointer; background: #f0f0f0; }
-    .admin-only { display: none; }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h2>Login</h2>
-  <input id="username" placeholder="Username">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <hr/>
-
-  <div id="main" style="display:none;">
-    <h2>Data Pelanggan</h2>
-    <button onclick="logout()">Logout</button>
-    <button class="admin-only" onclick="showPasswordChanger()">Ganti Password</button>
-    <div id="passwordChanger" style="display:none">
-      <h3>Ganti Password User</h3>
-      <input id="targetUser" placeholder="Username">
-      <input id="newPassword" type="password" placeholder="Password baru">
-      <button onclick="changePassword()">Ganti</button>
+<body class="bg-gray-100 text-gray-800 p-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="bg-white p-6 rounded shadow">
+      <h2 class="text-xl font-semibold mb-4">Login</h2>
+      <div class="flex gap-4 mb-4">
+        <input id="username" class="border px-4 py-2 rounded w-1/3" placeholder="Username">
+        <input id="password" type="password" class="border px-4 py-2 rounded w-1/3" placeholder="Password">
+        <button onclick="login()" class="bg-blue-600 text-white px-4 py-2 rounded">Login</button>
+      </div>
     </div>
 
-    <table id="dataTable">
-      <thead id="tableHead"></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+    <div id="main" class="mt-6 hidden">
+      <div class="bg-white p-6 rounded shadow">
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="welcomeText" class="text-xl font-semibold">Data Pelanggan</h2>
+          <div class="flex gap-2">
+            <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded">Logout</button>
+            <button class="admin-only hidden bg-yellow-500 text-white px-4 py-2 rounded" onclick="showPasswordChanger()">Ganti Password</button>
+          </div>
+        </div>
+
+        <div id="passwordChanger" class="hidden mb-4">
+          <h3 class="font-semibold mb-2">Ganti Password User</h3>
+          <div class="flex gap-4 mb-2">
+            <input id="targetUser" class="border px-4 py-2 rounded w-1/3" placeholder="Username">
+            <input id="newPassword" type="password" class="border px-4 py-2 rounded w-1/3" placeholder="Password baru">
+            <button onclick="changePassword()" class="bg-green-600 text-white px-4 py-2 rounded">Ganti</button>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <h3 class="font-semibold mb-2">Form Tambah/Edit Data</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+            <input id="form_id" class="border px-3 py-2 rounded" placeholder="ID">
+            <input id="form_nama" class="border px-3 py-2 rounded" placeholder="Nama">
+            <input id="form_email" class="border px-3 py-2 rounded" placeholder="Email">
+            <input id="form_hp1" class="border px-3 py-2 rounded" placeholder="HP1">
+            <input id="form_hp2" class="border px-3 py-2 rounded" placeholder="HP2">
+            <input id="form_wa_di_hp" class="border px-3 py-2 rounded" placeholder="WA di HP">
+            <input id="form_alamat" class="border px-3 py-2 rounded col-span-2" placeholder="Alamat">
+            <input id="form_lokasi" class="border px-3 py-2 rounded" placeholder="Lokasi">
+            <input id="form_sales" class="border px-3 py-2 rounded" placeholder="Sales">
+          </div>
+          <button onclick="saveForm()" class="bg-blue-600 text-white px-4 py-2 rounded">Simpan</button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full border text-sm">
+            <thead id="tableHead" class="bg-gray-200"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
-const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
+const apiUrl = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
 let data = [], userRole = '', userName = '';
 let currentSort = { column: '', asc: true };
 
@@ -48,9 +76,9 @@ async function login() {
   if (json.status === 'ok') {
     userRole = json.role;
     userName = uname;
-    document.getElementById('main').style.display = 'block';
-    document.querySelector('h2').textContent = `Selamat datang, ${uname} (${userRole})`;
-    if (userRole === 'admin') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-block');
+    document.getElementById('main').classList.remove('hidden');
+    document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
+    if (userRole === 'admin') document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
     loadData();
   } else {
     alert('Login gagal');
@@ -62,7 +90,7 @@ function logout() {
 }
 
 function showPasswordChanger() {
-  document.getElementById('passwordChanger').style.display = 'block';
+  document.getElementById('passwordChanger').classList.remove('hidden');
 }
 
 async function changePassword() {
@@ -102,6 +130,7 @@ function renderTable() {
   const tr = document.createElement('tr');
   headers.forEach(h => {
     const th = document.createElement('th');
+    th.className = 'p-2';
     th.textContent = h.replace(/_/g, ' ').toUpperCase();
     th.onclick = () => sortTableBy(h);
     tr.appendChild(th);
@@ -112,10 +141,11 @@ function renderTable() {
     const tr = document.createElement('tr');
     headers.forEach(h => {
       const td = document.createElement('td');
+      td.className = 'p-2';
       if (h.startsWith('foto') && row[h]) {
-        td.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${row[h]}" width="100"/>`;
+        td.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${row[h]}" class="w-24"/>`;
       } else if (h.startsWith('video') && row[h]) {
-        td.innerHTML = `<video width="160" controls><source src="https://drive.google.com/uc?export=view&id=${row[h]}" type="video/mp4"></video>`;
+        td.innerHTML = `<video class="w-40" controls><source src="https://drive.google.com/uc?export=view&id=${row[h]}" type="video/mp4"></video>`;
       } else {
         td.textContent = row[h];
       }
@@ -123,6 +153,34 @@ function renderTable() {
     });
     body.appendChild(tr);
   });
+}
+
+async function saveForm() {
+  const formData = {
+    method: "PUT",
+    id: document.getElementById("form_id").value,
+    nama: document.getElementById("form_nama").value,
+    email: document.getElementById("form_email").value,
+    hp1: document.getElementById("form_hp1").value,
+    hp2: document.getElementById("form_hp2").value,
+    wa_di_hp: document.getElementById("form_wa_di_hp").value,
+    alamat: document.getElementById("form_alamat").value,
+    lokasi: document.getElementById("form_lokasi").value,
+    sales: document.getElementById("form_sales").value,
+  };
+
+  if (!formData.id || !formData.nama || !formData.email || !formData.hp1) {
+    alert("Kolom ID, Nama, Email, dan HP1 wajib diisi.");
+    return;
+  }
+
+  const res = await fetch(apiUrl, {
+    method: "POST",
+    body: JSON.stringify(formData)
+  });
+  const text = await res.text();
+  alert(text);
+  loadData();
 }
 </script>
 </body>
