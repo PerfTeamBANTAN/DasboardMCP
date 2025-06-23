@@ -34,11 +34,36 @@ function buildTable(data) {
     row.dataset.id = data[i][3];
 
     data[i].forEach((cell, j) => {
-      const td = document.createElement("td");
-      td.contentEditable = user.role === 'admin' && j >= 4;
-      td.textContent = cell;
-      row.appendChild(td);
-    });
+  const td = document.createElement("td");
+  td.contentEditable = user.role === 'admin' && j >= 4;
+
+  const isMediaColumn = j >= 14 && j <= 20; // Kolom foto & video
+
+  if (isMediaColumn && cell && cell.length > 10) {
+    if (j <= 18) {
+      // Tampilkan foto
+      const img = document.createElement("img");
+      img.src = `https://drive.google.com/uc?export=view&id=${cell}`;
+      img.style.maxWidth = "100px";
+      img.style.borderRadius = "8px";
+      img.style.margin = "4px 0";
+      td.appendChild(img);
+    } else {
+      // Tampilkan video
+      const video = document.createElement("video");
+      video.src = `https://drive.google.com/uc?export=view&id=${cell}`;
+      video.controls = true;
+      video.style.maxWidth = "160px";
+      video.style.margin = "4px 0";
+      td.appendChild(video);
+    }
+  } else {
+    td.textContent = cell;
+  }
+
+  row.appendChild(td);
+});
+
 
     if (user.role === 'admin') {
       const tdAction = document.createElement("td");
