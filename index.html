@@ -1,21 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
+DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Web Bot</title>
-  <link rel="stylesheet" href="assets/style.css" />
+  <meta charset="UTF-8">
+  <title>Data Pelanggan - CRUD</title>
+  <style>
+    table, th, td {
+      border: 1px solid #ccc;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+    th { background: #f0f0f0; }
+    input, textarea {
+      width: 100%;
+    }
+    .editable-row td {
+      background: #ffffe0;
+    }
+  </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Login Web Bot</h2>
-    <form id="login-form">
-      <input type="text" id="username" placeholder="Username" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-    <div id="login-error" class="error"></div>
-  </div>
-  <script src="js/auth.js"></script>
+  <h2>Data Pelanggan (Editable)</h2>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>id</th><th>nama</th><th>email</th><th>hp1</th><th>hp2</th><th>wa di hp</th><th>alamat</th>
+        <th>lokasi</th><th>keterangan alamat</th><th>janji aktivasi</th>
+        <th>sales</th><th>tl sales</th><th>foto1</th><th>video1</th><th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/YOUR_DEPLOYED_API_URL/exec"; // Ganti ini
+
+    async function fetchData() {
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      const tbody = document.querySelector("#dataTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><input value="${row.id}" data-key="id" disabled></td>
+          <td><input value="${row.nama}" data-key="nama"></td>
+          <td><input value="${row.email}" data-key="email"></td>
+          <td><input value="${row.hp1}" data-key="hp1"></td>
+          <td><input value="${row.hp2}" data-key="hp2"></td>
+          <td><input value="${row.wa_di_hp}" data-key="wa_di_hp"></td>
+          <td><textarea data-key="alamat">${row.alamat}</textarea></td>
+          <td><input value="${row.lokasi}" data-key="lokasi"></td>
+          <td><textarea data-key="keterangan_alamat">${row.keterangan_alamat}</textarea></td>
+          <td><input value="${row.janji_aktivasi}" data-key="janji_aktivasi"></td>
+          <td><input value="${row.sales}" data-key="sales"></td>
+          <td><input value="${row.tl_sales}" data-key="tl_sales"></td>
+          <td><input value="${row.foto1}" data-key="foto1"></td>
+          <td><input value="${row.video1}" data-key="video1"></td>
+          <td>
+            <button onclick="saveRow(this)">Simpan</button>
+            <button onclick="deleteRow('${row.id}')">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function saveRow(button) {
+      const row = button.closest("tr");
+      const inputs = row.querySelectorAll("input, textarea");
+      const data = {};
+      inputs.forEach(input => {
+        const key = input.dataset.key;
+        if (key) data[key] = input.value;
+      });
+      data.method = "PUT";
+
+      await fetch(apiUrl, {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      alert("Data diperbarui");
+    }
+
+    async function deleteRow(id) {
+      if (!confirm("Hapus data dengan ID " + id + " ?")) return;
+      await fetch(apiUrl, {
+        method: "POST",
+        body: JSON.stringify({ method: "DELETE", id })
+      });
+      alert("Data dihapus");
+      fetchData();
+    }
+
+    fetchData();
+  </script>
 </body>
 </html>
