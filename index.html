@@ -38,32 +38,31 @@
     </div>
 
   </div>
-
+<script>
   const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
-let data = [], userRole = '', userName = '';
+  let data = [], userRole = '', userName = '';
 
-function login() {
-  const uname = document.getElementById('username').value;
-  const pass = document.getElementById('password').value;
-  fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`)
-    .then(res => res.json())
-    .then(json => {
-      if (json.status === 'ok') {
-        userRole = json.role;
-        userName = uname;
-        document.getElementById('loginBox').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
-        if (userRole === 'admin' || userRole === 'hd') {
-          document.querySelectorAll('.admin-only, .hd-only').forEach(e => e.classList.remove('hidden'));
+  function login() {
+    const uname = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`)
+      .then(res => res.json())
+      .then(json => {
+        if (json.status === 'ok') {
+          userRole = json.role;
+          userName = uname;
+          document.getElementById('loginBox').classList.add('hidden');
+          document.getElementById('app').classList.remove('hidden');
+          document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
+          if (userRole === 'admin' || userRole === 'hd') {
+            document.querySelectorAll('.admin-only, .hd-only').forEach(e => e.classList.remove('hidden'));
+          }
+          loadData();
+        } else {
+          alert('Login gagal');
         }
-        loadData();
-      } else {
-        alert('Login gagal');
-      }
-    });
-}
-
+      });
+  }
 function logout() {
   location.reload();
 }
