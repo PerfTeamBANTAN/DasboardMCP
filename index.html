@@ -50,6 +50,15 @@
     <h2 id="welcomeText" class="text-lg font-semibold text-gray-700"></h2>
   </div>
 
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="px-6 py-8 text-center text-gray-600 hidden">
+    <svg class="animate-spin h-8 w-8 text-primary mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+    </svg>
+    Memuat data pelanggan...
+  </div>
+
   <!-- Password Change Section -->
   <div id="passwordChanger" class="hidden px-6 mt-6">
     <div class="bg-white p-4 rounded-md shadow">
@@ -126,15 +135,41 @@ function toggleData() {
 }
 
 function loadData() {
+  document.getElementById("loadingSpinner").classList.remove("hidden");
+  document.getElementById("dataSection").classList.add("hidden");
+
   fetch(apiUrl)
     .then(res => res.json())
-    .then(json => { data = json; });
+    .then(json => {
+      data = json;
+      renderTable();
+      document.getElementById("loadingSpinner").classList.add("hidden");
+      document.getElementById("dataSection").classList.remove("hidden");
+    })
+    .catch(err => {
+      console.error("Gagal ambil data:", err);
+      document.getElementById("loadingSpinner").innerHTML = `
+        <p class="text-red-500">❌ Gagal memuat data. Periksa koneksi atau endpoint.</p>
+      `;
+    });
 }
 
 function renderTable() {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   const keys = ["id","nama","email","hp1","hp2","wa_di_hp","alamat","lokasi","keterangan_alamat","janji_aktivasi","sales","tl_sales","foto1","foto2","foto3","foto4","foto5","video1","video2"];
+
+  if (data.length === 0) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = keys.length + 1;
+    td.className = 'text-center text-gray-500 p-4';
+    td.textContent = 'Tidak ada data tersedia.';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
   data.forEach(row => {
     const tr = document.createElement('tr');
     keys.forEach(k => {
@@ -149,11 +184,13 @@ function renderTable() {
       }
       tr.appendChild(td);
     });
+
     if (userRole === 'admin' || userRole === 'hd') {
       const tdEdit = document.createElement('td');
       tdEdit.innerHTML = `<button class="text-indigo-600 hover:underline" onclick='alert("Edit belum tersedia")'>Edit</button>`;
       tr.appendChild(tdEdit);
     }
+
     tbody.appendChild(tr);
   });
 }
