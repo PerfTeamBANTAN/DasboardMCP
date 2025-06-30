@@ -3,209 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web CRUD Admin</title>
+  <title>Login MCP</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
-  body {
-    background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1600&q=80');
-    background-size: cover;
-    background-position: center;
-  }
-  @keyframes fade-in-down {
-    0% {
-      opacity: 0;
-      transform: translateY(-20px);
+    body {
+      background-image: url('https://images.unsplash.com/photo-1573496267526-08a69e46a409?auto=format&fit=crop&w=1600&q=80');
+      background-size: cover;
+      background-position: center;
     }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .animate-fade-in-down {
-    animation: fade-in-down 0.7s ease-out;
-  }
-</style>
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-  <div class="w-full max-w-6xl bg-white shadow-2xl rounded-xl flex overflow-hidden">
-    
-    <!-- Kiri: Logo -->
-    <div class="w-1/2 bg-gray-100 flex items-center justify-center p-8">
-  <img src="MCP.png" alt="Logo MCP"
-       class="w-[360px] h-[220px] object-contain bg-white rounded shadow-md p-2 border border-gray-200">
-</div>
-    <!-- Kanan: Form Login -->
-    <div class="w-1/2 p-12 bg-white">
-      <h2 class="text-3xl font-bold text-gray-800 mb-8">Login</h2>
+<body class="min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-4xl bg-white bg-opacity-90 shadow-2xl rounded-xl flex overflow-hidden">
+
+    <!-- Logo -->
+    <div class="w-1/2 bg-gray-100 flex items-center justify-center p-6">
+      <img src="MCP.png" alt="Logo MCP"
+           class="w-[300px] h-[180px] object-contain bg-white rounded shadow-md p-2 border border-gray-200">
+    </div>
+
+    <!-- Form Login -->
+    <div id="loginBox" class="w-1/2 p-8">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">Login</h2>
       <div class="space-y-4">
-        <input type="text" id="username" placeholder="Username" class="w-full bg-blue-50 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <input type="password" id="password" placeholder="Password" class="w-full bg-blue-50 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <input type="text" id="company" placeholder="Telkom" class="w-full border border-gray-300 px-4 py-2 rounded" />
-        <button onclick="login()" class="w-full bg-red-700 hover:bg-red-800 text-white py-2 rounded shadow-md transition">Masuk</button>
+        <input type="text" id="username" placeholder="Username"
+               class="w-full bg-blue-50 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <input type="password" id="password" placeholder="Password"
+               class="w-full bg-blue-50 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <input type="text" id="company" placeholder="Telkom"
+               class="w-full border border-gray-300 px-4 py-2 rounded" />
+        <button onclick="login()"
+                class="w-full bg-red-700 hover:bg-red-800 text-white py-2 rounded shadow-md transition">Masuk</button>
       </div>
     </div>
 
-    <!-- Main Area -->
-    <div id="app" class="hidden bg-white rounded-lg shadow-md p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h2 id="welcomeText" class="text-xl font-bold text-gray-800">Data Pelanggan</h2>
-        <div class="flex gap-2">
-          <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded">Logout</button>
-          <button class="admin-only hidden bg-yellow-500 text-white px-4 py-2 rounded" onclick="showPasswordChanger()">Ganti Password</button>
-        </div>
-      </div>
-
-      <!-- Password Change -->
-      <div id="passwordChanger" class="hidden mb-4">
-        <h3 class="font-semibold mb-2">Ganti Password User</h3>
-        <div class="flex flex-wrap gap-4">
-          <input id="targetUser" class="border px-4 py-2 rounded w-1/4" placeholder="Username">
-          <input id="newPassword" type="password" class="border px-4 py-2 rounded w-1/4" placeholder="Password baru">
-          <button onclick="changePassword()" class="bg-green-600 text-white px-4 py-2 rounded">Ganti</button>
-        </div>
-      </div>
-
-      <!-- Data Table -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm border">
-          <thead class="bg-indigo-100 text-indigo-900">
-            <tr>
-              <th class="p-2">ID</th><th class="p-2">NAMA</th><th class="p-2">EMAIL</th><th class="p-2">HP1</th><th class="p-2">HP2</th>
-              <th class="p-2">WA DI HP</th><th class="p-2">ALAMAT</th><th class="p-2">LOKASI</th><th class="p-2">KETERANGAN ALAMAT</th><th class="p-2">JANJI AKTIVASI</th>
-              <th class="p-2">SALES</th><th class="p-2">TL SALES</th>
-              <th class="p-2">FOTO1</th><th class="p-2">FOTO2</th><th class="p-2">FOTO3</th><th class="p-2">FOTO4</th><th class="p-2">FOTO5</th>
-              <th class="p-2">VIDEO1</th><th class="p-2">VIDEO2</th>
-              <th class="p-2 admin-only hd-only">Update Teknisi</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Modal Edit -->
-    <div id="modalEdit" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-      <div class="bg-white p-6 rounded shadow-md w-full max-w-2xl">
-        <h3 class="text-lg font-semibold mb-4">Edit Data Pelanggan</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <input id="edit_id" class="border px-3 py-2 rounded" placeholder="ID">
-          <input id="edit_nama" class="border px-3 py-2 rounded" placeholder="Nama">
-          <input id="edit_email" class="border px-3 py-2 rounded" placeholder="Email">
-          <input id="edit_hp1" class="border px-3 py-2 rounded" placeholder="HP1">
-          <input id="edit_hp2" class="border px-3 py-2 rounded" placeholder="HP2">
-          <input id="edit_wa_di_hp" class="border px-3 py-2 rounded" placeholder="WA di HP">
-          <input id="edit_alamat" class="border px-3 py-2 rounded col-span-2" placeholder="Alamat">
-          <input id="edit_lokasi" class="border px-3 py-2 rounded" placeholder="Lokasi">
-          <input id="edit_keterangan_alamat" class="border px-3 py-2 rounded col-span-2" placeholder="Keterangan Alamat">
-          <input id="edit_janji_aktivasi" class="border px-3 py-2 rounded" placeholder="Janji Aktivasi">
-          <input id="edit_sales" class="border px-3 py-2 rounded" placeholder="Sales">
-          <input id="edit_tl_sales" class="border px-3 py-2 rounded" placeholder="TL Sales">
-        </div>
-        <div class="flex justify-end mt-4">
-          <button onclick="closeEditModal()" class="px-4 py-2 bg-gray-400 text-white rounded mr-2">Batal</button>
-          <button onclick="submitEdit()" class="px-4 py-2 bg-blue-600 text-white rounded">Simpan</button>
-        </div>
-      </div>
-    </div>
   </div>
 
-<script>
-const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
-let data = [], userRole = '', userName = '';
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/YOUR-SCRIPT-ID-HERE/exec";
+    let userRole = "", userName = "";
 
-function login() {
-  const uname = document.getElementById('username').value;
-  const pass = document.getElementById('password').value;
-  fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`)
-    .then(res => res.json())
-    .then(json => {
-      if (json.status === 'ok') {
-        userRole = json.role;
-        userName = uname;
-        document.getElementById('loginBox').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
-        if (userRole === 'admin' || userRole === 'hd') document.querySelectorAll('.admin-only, .hd-only').forEach(e => e.classList.remove('hidden'));
-        loadData();
-      } else {
-        alert('Login gagal');
-      }
-    });
-}
+    function login() {
+      const uname = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
 
-function logout() { location.reload(); }
-function showPasswordChanger() { document.getElementById('passwordChanger').classList.remove('hidden'); }
-function closeEditModal() { document.getElementById('modalEdit').classList.add('hidden'); }
-
-function loadData() {
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(json => {
-      data = json;
-      renderTable();
-    });
-}
-
-function renderTable() {
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-  const visibleKeys = ["id","nama","email","hp1","hp2","wa_di_hp","alamat","lokasi","keterangan_alamat","janji_aktivasi","sales","tl_sales","foto1","foto2","foto3","foto4","foto5","video1","video2"];
-  data.forEach(row => {
-    const tr = document.createElement('tr');
-    visibleKeys.forEach(k => {
-      const td = document.createElement('td');
-      td.className = 'p-2';
-      if (k.startsWith('foto') && row[k]) {
-        td.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${row[k]}" class="w-20 h-auto">`;
-      } else if (k.startsWith('video') && row[k]) {
-        td.innerHTML = `<video class="w-32" controls><source src="https://drive.google.com/uc?export=view&id=${row[k]}" type="video/mp4"></video>`;
-      } else {
-        td.textContent = row[k] || '';
-      }
-      tr.appendChild(td);
-    });
-    if (userRole === 'admin' || userRole === 'hd') {
-      const tdEdit = document.createElement('td');
-      tdEdit.innerHTML = `<button onclick='openEdit(${JSON.stringify(row)})' class='text-blue-600 hover:underline'>Edit</button>`;
-      tr.appendChild(tdEdit);
+      fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`)
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'ok') {
+            userRole = json.role;
+            userName = uname;
+            const loginBox = document.getElementById('loginBox');
+            if (loginBox) loginBox.classList.add('hidden');
+            alert(`Login berhasil: ${uname} (${userRole})`);
+            // Lanjut ke dashboard atau tampilkan konten lainnya
+          } else {
+            alert('Login gagal');
+          }
+        });
     }
-    tbody.appendChild(tr);
-  });
-}
-
-function openEdit(row) {
-  document.getElementById('modalEdit').classList.remove('hidden');
-  for (const key in row) {
-    const input = document.getElementById(`edit_${key}`);
-    if (input) input.value = row[key];
-  }
-}
-
-function submitEdit() {
-  const fields = ["id","nama","email","hp1","hp2","wa_di_hp","alamat","lokasi","keterangan_alamat","janji_aktivasi","sales","tl_sales"];
-  const payload = { method: 'PUT' };
-  fields.forEach(f => payload[f] = document.getElementById(`edit_${f}`).value);
-
-  fetch(apiUrl, {
-    method: 'POST',
-    body: JSON.stringify(payload)
-  }).then(res => res.text()).then(msg => {
-    alert(msg);
-    closeEditModal();
-    loadData();
-  });
-}
-
-function changePassword() {
-  const uname = document.getElementById('targetUser').value.trim();
-  const pass = document.getElementById('newPassword').value.trim();
-  if (!uname || !pass) return alert('Lengkapi isian');
-  fetch(apiUrl, {
-    method: 'POST',
-    body: JSON.stringify({ method: 'CHANGE_PASSWORD', username: uname, password: pass })
-  }).then(res => res.text()).then(alert);
-}
-</script>
+  </script>
 </body>
 </html>
