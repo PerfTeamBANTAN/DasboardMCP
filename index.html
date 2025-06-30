@@ -93,6 +93,21 @@
 </div>
 
 <script>
+window.onload = function () {
+  const savedRole = localStorage.getItem('userRole');
+  const savedUser = localStorage.getItem('userName');
+  if (savedRole && savedUser) {
+    userRole = savedRole;
+    userName = savedUser;
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('welcomeText').textContent = `Selamat datang, ${userName} (${userRole})`;
+    if (userRole === 'admin' || userRole === 'hd') {
+      document.querySelectorAll('.admin-only, .hd-only').forEach(e => e.classList.remove('hidden'));
+    }
+    loadData();
+  }
+}
 const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
 let data = [], userRole = '', userName = '';
 
@@ -107,12 +122,19 @@ function login() {
       if (json.status === 'ok') {
         userRole = json.role;
         userName = uname;
+
+        // ✅ Simpan ke localStorage
+        localStorage.setItem('userRole', userRole);
+        localStorage.setItem('userName', userName);
+
         document.getElementById('loginBox').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
+
         if (userRole === 'admin' || userRole === 'hd') {
           document.querySelectorAll('.admin-only, .hd-only').forEach(e => e.classList.remove('hidden'));
         }
+
         loadData();
       } else {
         document.getElementById('loginStatus').classList.remove('hidden');
@@ -124,9 +146,9 @@ function login() {
     });
 }
 
-function logout() { location.reload(); }
-function showPasswordChanger() {
-  document.getElementById('passwordChanger').classList.toggle('hidden');
+function logout() {
+  localStorage.clear();
+  location.reload();
 }
 function toggleData() {
   const section = document.getElementById('dataSection');
