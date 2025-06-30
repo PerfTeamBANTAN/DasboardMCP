@@ -160,7 +160,7 @@ function loadData() {
   document.getElementById("loadingSpinner").classList.remove("hidden");
   document.getElementById("dataSection").classList.add("hidden");
 
-  fetch(apiUrl)
+  fetch(`${apiUrl}?action=data`)
     .then(res => res.json())
     .then(json => {
       data = json;
@@ -177,6 +177,11 @@ function loadData() {
 }
 
 function renderTable() {
+  if (!Array.isArray(data)) {
+  document.getElementById("tableBody").innerHTML = `
+    <tr><td colspan="20" class="p-4 text-center text-red-500">❌ Format data tidak valid.</td></tr>`;
+  return;
+}
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   const keys = ["id","nama","email","hp1","hp2","wa_di_hp","alamat","lokasi","keterangan_alamat","janji_aktivasi","sales","tl_sales","foto1","foto2","foto3","foto4","foto5","video1","video2"];
