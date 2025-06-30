@@ -3,46 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login MCP</title>
+  <title>Dashboard MCP</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      background-image: url('https://images.unsplash.com/photo-1573496267526-08a69e46a409?auto=format&fit=crop&w=1600&q=80');
-      background-size: cover;
-      background-position: center;
-    }
-  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center">
-  <div class="w-full max-w-4xl bg-white bg-opacity-90 shadow-2xl rounded-xl flex overflow-hidden">
-
-    <!-- Logo -->
-    <div class="w-1/2 bg-gray-100 flex items-center justify-center p-6">
-      <img src="MCP.png" alt="Logo MCP"
-           class="w-[300px] h-[180px] object-contain bg-white rounded shadow-md p-2 border border-gray-200">
-    </div>
-
-    <!-- Form Login -->
-    <div id="loginBox" class="w-1/2 p-8">
-      <h2 class="text-3xl font-bold text-gray-800 mb-6">Login</h2>
+<body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen flex items-center justify-center p-8">
+  <div class="w-full max-w-5xl">
+    <!-- Login Box -->
+    <div id="loginBox" class="bg-white rounded-lg shadow-lg p-8 mb-8">
+      <h2 class="text-3xl font-bold text-center text-indigo-700 mb-6">Admin Login</h2>
       <div class="space-y-4">
-        <input type="text" id="username" placeholder="Username"
-               class="w-full bg-blue-50 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <input type="password" id="password" placeholder="Password"
-               class="w-full bg-blue-50 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <input type="text" id="company" placeholder="Telkom"
-               class="w-full border border-gray-300 px-4 py-2 rounded" />
-        <button onclick="login()"
-                class="w-full bg-red-700 hover:bg-red-800 text-white py-2 rounded shadow-md transition">Masuk</button>
+        <input id="username" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Username">
+        <input id="password" type="password" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Password">
+        <button onclick="login()" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">Login</button>
       </div>
     </div>
 
-  </div>
-<script>
-  const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
-  let data = [], userRole = '', userName = '';
+    <!-- App Area -->
+    <div id="app" class="hidden bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 id="welcomeText" class="text-xl font-bold text-gray-800">Data Pelanggan</h2>
+        <div class="flex gap-2">
+          <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded">Logout</button>
+          <button class="admin-only hidden bg-yellow-500 text-white px-4 py-2 rounded" onclick="showPasswordChanger()">Ganti Password</button>
+        </div>
+      </div>
 
-  function login() {
+      <div id="passwordChanger" class="hidden mb-4">
+        <h3 class="font-semibold mb-2">Ganti Password User</h3>
+        <div class="flex flex-wrap gap-4">
+          <input id="targetUser" class="border px-4 py-2 rounded w-1/4" placeholder="Username">
+          <input id="newPassword" type="password" class="border px-4 py-2 rounded w-1/4" placeholder="Password baru">
+          <button onclick="changePassword()" class="bg-green-600 text-white px-4 py-2 rounded">Ganti</button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border">
+          <thead class="bg-indigo-100 text-indigo-900">
+            <tr>
+              <th class="p-2">ID</th><th class="p-2">NAMA</th><th class="p-2">EMAIL</th><th class="p-2">HP1</th><th class="p-2">HP2</th>
+              <th class="p-2">WA DI HP</th><th class="p-2">ALAMAT</th><th class="p-2">LOKASI</th><th class="p-2">KETERANGAN ALAMAT</th><th class="p-2">JANJI AKTIVASI</th>
+              <th class="p-2">SALES</th><th class="p-2">TL SALES</th>
+              <th class="p-2">FOTO1</th><th class="p-2">FOTO2</th><th class="p-2">FOTO3</th><th class="p-2">FOTO4</th><th class="p-2">FOTO5</th>
+              <th class="p-2">VIDEO1</th><th class="p-2">VIDEO2</th>
+              <th class="p-2 admin-only hd-only">Update Teknisi</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
+let data = [], userRole = '', userName = '';
+
+function login() {
   const uname = document.getElementById('username').value;
   const pass = document.getElementById('password').value;
 
@@ -52,34 +69,23 @@
       if (json.status === 'ok') {
         userRole = json.role;
         userName = uname;
-
         const loginBox = document.getElementById('loginBox');
+        const app = document.getElementById('app');
         if (loginBox) loginBox.classList.add('hidden');
-
-        document.getElementById('app').classList.remove('hidden');
+        if (app) app.classList.remove('hidden');
         document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
-
         if (userRole === 'admin' || userRole === 'hd') {
           document.querySelectorAll('.admin-only, .hd-only').forEach(e => e.classList.remove('hidden'));
         }
-
         loadData();
       } else {
         alert('Login gagal');
       }
     });
 }
-function logout() {
-  location.reload();
-}
 
-function showPasswordChanger() {
-  document.getElementById('passwordChanger').classList.remove('hidden');
-}
-
-function closeEditModal() {
-  document.getElementById('modalEdit').classList.add('hidden');
-}
+function logout() { location.reload(); }
+function showPasswordChanger() { document.getElementById('passwordChanger').classList.remove('hidden'); }
 
 function loadData() {
   fetch(apiUrl)
@@ -93,8 +99,7 @@ function loadData() {
 function renderTable() {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  const visibleKeys = ["id", "nama", "email", "hp1", "hp2", "wa_di_hp", "alamat", "lokasi", "keterangan_alamat", "janji_aktivasi", "sales", "tl_sales", "foto1", "foto2", "foto3", "foto4", "foto5", "video1", "video2"];
-  
+  const visibleKeys = ["id","nama","email","hp1","hp2","wa_di_hp","alamat","lokasi","keterangan_alamat","janji_aktivasi","sales","tl_sales","foto1","foto2","foto3","foto4","foto5","video1","video2"];
   data.forEach(row => {
     const tr = document.createElement('tr');
     visibleKeys.forEach(k => {
@@ -109,37 +114,12 @@ function renderTable() {
       }
       tr.appendChild(td);
     });
-
     if (userRole === 'admin' || userRole === 'hd') {
       const tdEdit = document.createElement('td');
-      tdEdit.innerHTML = `<button onclick='openEdit(${JSON.stringify(row)})' class='text-blue-600 hover:underline'>Edit</button>`;
+      tdEdit.innerHTML = `<button onclick='alert("Edit not implemented")' class='text-blue-600 hover:underline'>Edit</button>`;
       tr.appendChild(tdEdit);
     }
-
     tbody.appendChild(tr);
-  });
-}
-
-function openEdit(row) {
-  document.getElementById('modalEdit').classList.remove('hidden');
-  for (const key in row) {
-    const input = document.getElementById(`edit_${key}`);
-    if (input) input.value = row[key];
-  }
-}
-
-function submitEdit() {
-  const fields = ["id", "nama", "email", "hp1", "hp2", "wa_di_hp", "alamat", "lokasi", "keterangan_alamat", "janji_aktivasi", "sales", "tl_sales"];
-  const payload = { method: 'PUT' };
-  fields.forEach(f => payload[f] = document.getElementById(`edit_${f}`).value);
-
-  fetch(apiUrl, {
-    method: 'POST',
-    body: JSON.stringify(payload)
-  }).then(res => res.text()).then(msg => {
-    alert(msg);
-    closeEditModal();
-    loadData();
   });
 }
 
@@ -147,7 +127,6 @@ function changePassword() {
   const uname = document.getElementById('targetUser').value.trim();
   const pass = document.getElementById('newPassword').value.trim();
   if (!uname || !pass) return alert('Lengkapi isian');
-  
   fetch(apiUrl, {
     method: 'POST',
     body: JSON.stringify({ method: 'CHANGE_PASSWORD', username: uname, password: pass })
