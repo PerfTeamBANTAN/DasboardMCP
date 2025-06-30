@@ -39,29 +39,115 @@
 
   </div>
 
-  <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
-    let userRole = "", userName = "";
+  const apiUrl = "https://script.google.com/macros/s/AKfycbwrybL4k1v7f5iaUzhgE7uyrYyI6WOLZSXYrvVnqum6PDVIQHYwhA6q4WsIfvgwYUqL/exec";
+let data = [], userRole = '', userName = '';
 
-    function login() {
-      const uname = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
+function login() {
+  const uname = document.getElementById('username').value;
+  const pass = document.getElementById('password').value;
+  fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`)
+    .then(res => res.json())
+    .then(json => {
+      if (json.status === 'ok') {
+        userRole = json.role;
+        userName = uname;
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('welcomeText').textContent = `Selamat datang, ${uname} (${userRole})`;
+        if (userRole === 'admin' || userRole === 'hd') {
+          document.querySelectorAll('.admin-only, .hd-only').forEach(e => e.classList.remove('hidden'));
+        }
+        loadData();
+      } else {
+        alert('Login gagal');
+      }
+    });
+}
 
-      fetch(`${apiUrl}?action=login&username=${uname}&password=${pass}`)
-        .then(res => res.json())
-        .then(json => {
-          if (json.status === 'ok') {
-            userRole = json.role;
-            userName = uname;
-            const loginBox = document.getElementById('loginBox');
-            if (loginBox) loginBox.classList.add('hidden');
-            alert(`Login berhasil: ${uname} (${userRole})`);
-            // Lanjut ke dashboard atau tampilkan konten lainnya
-          } else {
-            alert('Login gagal');
-          }
-        });
+function logout() {
+  location.reload();
+}
+
+function showPasswordChanger() {
+  document.getElementById('passwordChanger').classList.remove('hidden');
+}
+
+function closeEditModal() {
+  document.getElementById('modalEdit').classList.add('hidden');
+}
+
+function loadData() {
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(json => {
+      data = json;
+      renderTable();
+    });
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  const visibleKeys = ["id", "nama", "email", "hp1", "hp2", "wa_di_hp", "alamat", "lokasi", "keterangan_alamat", "janji_aktivasi", "sales", "tl_sales", "foto1", "foto2", "foto3", "foto4", "foto5", "video1", "video2"];
+  
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    visibleKeys.forEach(k => {
+      const td = document.createElement('td');
+      td.className = 'p-2';
+      if (k.startsWith('foto') && row[k]) {
+        td.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${row[k]}" class="w-20 h-auto">`;
+      } else if (k.startsWith('video') && row[k]) {
+        td.innerHTML = `<video class="w-32" controls><source src="https://drive.google.com/uc?export=view&id=${row[k]}" type="video/mp4"></video>`;
+      } else {
+        td.textContent = row[k] || '';
+      }
+      tr.appendChild(td);
+    });
+
+    if (userRole === 'admin' || userRole === 'hd') {
+      const tdEdit = document.createElement('td');
+      tdEdit.innerHTML = `<button onclick='openEdit(${JSON.stringify(row)})' class='text-blue-600 hover:underline'>Edit</button>`;
+      tr.appendChild(tdEdit);
     }
-  </script>
+
+    tbody.appendChild(tr);
+  });
+}
+
+function openEdit(row) {
+  document.getElementById('modalEdit').classList.remove('hidden');
+  for (const key in row) {
+    const input = document.getElementById(`edit_${key}`);
+    if (input) input.value = row[key];
+  }
+}
+
+function submitEdit() {
+  const fields = ["id", "nama", "email", "hp1", "hp2", "wa_di_hp", "alamat", "lokasi", "keterangan_alamat", "janji_aktivasi", "sales", "tl_sales"];
+  const payload = { method: 'PUT' };
+  fields.forEach(f => payload[f] = document.getElementById(`edit_${f}`).value);
+
+  fetch(apiUrl, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }).then(res => res.text()).then(msg => {
+    alert(msg);
+    closeEditModal();
+    loadData();
+  });
+}
+
+function changePassword() {
+  const uname = document.getElementById('targetUser').value.trim();
+  const pass = document.getElementById('newPassword').value.trim();
+  if (!uname || !pass) return alert('Lengkapi isian');
+  
+  fetch(apiUrl, {
+    method: 'POST',
+    body: JSON.stringify({ method: 'CHANGE_PASSWORD', username: uname, password: pass })
+  }).then(res => res.text()).then(alert);
+}
+</script>
 </body>
 </html>
